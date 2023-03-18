@@ -209,16 +209,6 @@ init() {
   fi
 }
 
-with_stash() {
-  if [[ ${no_git-} == true ]]; then
-    "$@"
-  else
-    git stash >/dev/null
-    "$@"
-    git stash pop >/dev/null
-  fi
-}
-
 main() {
   if (($# == 0)); then
     help
@@ -246,12 +236,12 @@ main() {
       exit
       ;;
     push)
-      with_stash update_site
+      update_site
       exit
       ;;
     status)
       echo "Pending changes on the remote:"
-      with_stash list_pending_file_changes
+      list_pending_file_changes
       exit
       ;;
     list)
