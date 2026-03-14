@@ -194,12 +194,15 @@ help() {
 
 init() {
   local -r new_config=$config_dir/$user
+  local -r site_dir=${derived_from_pwd:+$PWD}
+  local -r site_dir_value=${site_dir:-~/Documents/$user}
+
   mkdir -p -- "$config_dir"
   if [[ -f $new_config ]]; then
     echo "This profile already exists."
   else
-    cat <<-'EOF' >"$new_config"
-			site_directory=~/Documents/my_site
+    cat <<-EOF >"$new_config"
+			site_directory=$site_dir_value
 			api_key=da77c3530c30593663bf7b797323e48c
 			ignore_regex='\.md$|\.gitignore$|(^|/)drafts/'
 			n_concurrent_tasks=16
@@ -231,7 +234,13 @@ main() {
       read_config "$config_dir/${1:?Profile name is not set.}"
       ;;
     init)
-      local -r user=${2:?Please provide a profile name.}
+      if [[ -n ${2-} ]]; then
+        local -r user=$2
+        local -r derived_from_pwd=false
+      else
+        local -r user=$(basename "$PWD")
+        local -r derived_from_pwd=true
+      fi
       init
       exit
       ;;
